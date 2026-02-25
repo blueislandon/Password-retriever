@@ -99,7 +99,7 @@
     }
 
     async function fetchFromSupabase() {
-        logToTerminal("\nInitializing request to Supabase...");
+        logToTerminal("\nInitializing request to Passwords...");
 
         try {
             // Use the new variable name here
@@ -109,16 +109,28 @@
 
             if (error) throw error;
 
-            logToTerminal("Success. Data retrieved:");
-            logToTerminal(JSON.stringify(data, null, 2)); 
+            logToTerminal(">_ DATA RETRIEVED:");
+            
+// 3. THE MAGIC STEP: Decrypting the specific columns
+            // Assuming your column name is 'encrypted_content'
+            const decryptedData = data.map(row => {
+                return {
+                    ...row,
+                    // If your column is named 'secret', change it here:
+                    password: decryptValue(row.password) 
+                };
+            });
+
+            logToTerminal("==========================================");
+            logToTerminal(JSON.stringify(decryptedData, null, 2));
+            logToTerminal("==========================================");
+            
         } catch (err) {
-            logToTerminal("!! ERROR: " + err.message);
-            console.error(err);
+            logToTerminal("!! CRITICAL ERROR: " + err.message);
         }
     }
 
     function logToTerminal(message) {
-        if (!output) return;
         output.innerText += "\n" + message;
         output.scrollTop = output.scrollHeight;
     }
