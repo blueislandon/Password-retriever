@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Retro Terminal Fetcher</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         body {
             background-color: #0a0a0a;
@@ -78,13 +80,23 @@
 <script>
     // 1. Setup Supabase Client
     // Renamed 'supabase' to 'supabaseClient' to avoid naming conflicts
+    const MASTER = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZqYmxkdGlwcHdyZHh5bmZ3aWR4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIwNTMyMzIsImV4cCI6MjA4NzYyOTIzMn0.7EQHHbYGSPH1mI6kh-XuyMVWxaPrQ4qw7PIBcy-j8I0";
     const _supabaseUrl = 'https://fjbldtippwrdxynfwidx.supabase.co';
     const _supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZqYmxkdGlwcHdyZHh5bmZ3aWR4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIwNTMyMzIsImV4cCI6MjA4NzYyOTIzMn0.7EQHHbYGSPH1mI6kh-XuyMVWxaPrQ4qw7PIBcy-j8I0';
     
     // Check if the library is loaded and create the client
     const supabaseClient = supabase.createClient(_supabaseUrl, _supabaseKey);
-
     const output = document.getElementById('output-window');
+
+    function decryptValue(cipherText) {
+        try {
+            const bytes = CryptoJS.AES.decrypt(cipherText, MASTER);
+            const originalText = bytes.toString(CryptoJS.enc.Utf8);
+            return originalText || "[Decryption Failed]"; 
+        } catch (e) {
+            return "[Error Decoding]";
+        }
+    }
 
     async function fetchFromSupabase() {
         logToTerminal("\nInitializing request to Supabase...");
