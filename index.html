@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Retro Terminal Fetcher</title>
+    <style>
+        body {
+            background-color: #0a0a0a;
+            color: #00ff41; /* Classic Matrix/Terminal Green */
+            font-family: 'Courier New', Courier, monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 50px;
+        }
+
+        .terminal-container {
+            width: 80%;
+            max-width: 800px;
+        }
+
+        /* This is your "Text Area" that isn't editable */
+        #output-window {
+            background-color: #000;
+            border: 1px solid #333;
+            border-radius: 5px;
+            height: 400px;
+            padding: 20px;
+            overflow-y: auto;
+            box-shadow: 0 0 15px rgba(0, 255, 65, 0.2);
+            white-space: pre-wrap; /* Maintains formatting/newlines */
+            word-wrap: break-word;
+        }
+
+        .controls {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        button {
+            background: #00ff41;
+            color: black;
+            border: none;
+            padding: 10px 20px;
+            font-family: 'Courier New', Courier, monospace;
+            font-weight: bold;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+
+        button:hover {
+            background: #00cc33;
+        }
+
+        .status {
+            color: #888;
+            font-size: 0.8rem;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="terminal-container">
+        <div class="status">SYSTEM READY... STANDBY FOR DATA</div>
+        <div id="output-window">/root/user/data_fetcher >_ </div>
+        
+        <div class="controls">
+            <button onclick="fetchFromSupabase()">Execute Fetch</button>
+            <button onclick="clearTerminal()">Clear</button>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script>
+        // 1. Setup Supabase Client
+        const _supabaseUrl = 'https://fjbldtippwrdxynfwidx.supabase.co';
+        const _supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZqYmxkdGlwcHdyZHh5bmZ3aWR4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIwNTMyMzIsImV4cCI6MjA4NzYyOTIzMn0.7EQHHbYGSPH1mI6kh-XuyMVWxaPrQ4qw7PIBcy-j8I0';
+        const supabase = supabase.createClient(_supabaseUrl, _supabaseKey);
+
+        const output = document.getElementById('output-window');
+
+        async function fetchFromSupabase() {
+            logToTerminal("\nInitializing request to Supabase...");
+
+            try {
+                // Change 'your_table_name' to your actual table
+                let { data, error } = await supabase
+                    .from('your_table_name')
+                    .select('*');
+
+                if (error) throw error;
+
+                logToTerminal("Success. Data retrieved:");
+                logToTerminal(JSON.stringify(data, null, 2)); // Pretty print JSON
+            } catch (err) {
+                logToTerminal("!! ERROR: " + err.message);
+            }
+        }
+
+        function logToTerminal(message) {
+            output.innerText += "\n" + message;
+            // Auto-scroll to bottom
+            output.scrollTop = output.scrollHeight;
+        }
+
+        function clearTerminal() {
+            output.innerText = "/root/user/data_fetcher >_";
+        }
+    </script>
+</body>
+</html>
