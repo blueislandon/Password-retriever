@@ -88,16 +88,26 @@
     const supabaseClient = supabase.createClient(_supabaseUrl, _supabaseKey);
     const output = document.getElementById('output-window');
 
-    function decryptValue(cipherText) {
-        try {
-            const bytes = CryptoJS.AES.decrypt(cipherText, MASTER);
-            const originalText = bytes.toString(CryptoJS.enc.Utf8);
-            return originalText || "[Decryption Failed]"; 
-        } catch (e) {
-            return "[Error Decoding]";
+function decryptValue(cipherText) {
+    if (!cipherText) return "[No Data]";
+    try {
+        // We explicitly tell CryptoJS to decrypt using our MASTER string
+        const bytes = CryptoJS.AES.decrypt(cipherText, MASTER);
+        
+        // Convert to UTF8 string manually to avoid CSP 'eval' issues
+        const originalText = bytes.toString(CryptoJS.enc.Utf8);
+        
+        // If it's empty, the key or the cipherText is wrong
+        if (!originalText || originalText.length === 0) {
+            return "[Key Mismatch]";
         }
+        
+        return originalText;
+    } catch (e) {
+        console.error("Decryption error:", e);
+        return "[Decryption Error]";
     }
-
+}
 async function fetchFromSupabase() {
     logToTerminal("\n>_ ACCESSING ENCRYPTED TERMINAL...");
     
