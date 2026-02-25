@@ -92,7 +92,7 @@
         try {
             // Use the new variable name here
             let { data, error } = await supabaseClient
-                .from('your_table_name')
+                .from('passwords')
                 .select('*');
 
             if (error) throw error;
