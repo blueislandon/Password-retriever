@@ -73,7 +73,7 @@
             try {
                 // CHANGE 'your_table_name' TO YOUR ACTUAL TABLE NAME
                 const { data, error } = await sbInstance
-                    .from('your_table_name')
+                    .from('passwords')
                     .select('*');
 
                 if (error) throw error;
