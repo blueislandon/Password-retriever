@@ -109,26 +109,7 @@ function decryptValue(cipherText) {
     }
 }
 async function fetchFromSupabase() {
-    logToTerminal("\n>_ ACCESSING ENCRYPTED TERMINAL...");
-    
-    try {
-        // Change 'your_table_name' to the actual name of your table
-        let { data, error } = await supabaseClient
-            .from('passwords') 
-            .select('*');
 
-        if (error) throw error;
-
-        logToTerminal(">_ DATA RETRIEVED. RUNNING DECRYPTION ALGORITHM...");
-
-        // Process the data
-        const decryptedData = data.map(row => {
-            return {
-                username: row.username,
-                // We target row.password because that's what shows in your image
-                password: decryptValue(row.password), 
-                created_at: row.created_at
-            };
             const decryptedData = data.map(row => {
     // TEMPORARY: Log the raw data to the console to see what it looks like
     console.log("Raw row from DB:", row.password); 
