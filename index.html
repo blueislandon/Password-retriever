@@ -3,142 +3,105 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Retro Terminal Fetcher</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <title>Secure Data Terminal</title>
     <style>
-        body {
-            background-color: #0a0a0a;
-            color: #00ff41; /* Classic Matrix/Terminal Green */
-            font-family: 'Courier New', Courier, monospace;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 50px;
+        body { background: #050505; color: #00ff41; font-family: 'Courier New', monospace; display: flex; flex-direction: column; align-items: center; padding: 40px; }
+        #terminal { 
+            background: #000; border: 2px solid #004400; border-radius: 8px; 
+            width: 90%; max-width: 850px; height: 450px; padding: 25px; 
+            overflow-y: auto; box-shadow: 0 0 20px #002200; white-space: pre-wrap;
+            line-height: 1.4; margin-bottom: 20px;
         }
-
-        .terminal-container {
-            width: 80%;
-            max-width: 800px;
+        .btn-group { display: flex; gap: 15px; }
+        button { 
+            background: #00ff41; color: #000; border: none; padding: 12px 24px; 
+            font-weight: 900; cursor: pointer; font-family: 'Courier New', monospace;
         }
-
-        /* This is your "Text Area" that isn't editable */
-        #output-window {
-            background-color: #000;
-            border: 1px solid #333;
-            border-radius: 5px;
-            height: 400px;
-            padding: 20px;
-            overflow-y: auto;
-            box-shadow: 0 0 15px rgba(0, 255, 65, 0.2);
-            white-space: pre-wrap; /* Maintains formatting/newlines */
-            word-wrap: break-word;
-        }
-
-        .controls {
-            margin-top: 20px;
-            display: flex;
-            gap: 10px;
-        }
-
-        button {
-            background: #00ff41;
-            color: black;
-            border: none;
-            padding: 10px 20px;
-            font-family: 'Courier New', Courier, monospace;
-            font-weight: bold;
-            cursor: pointer;
-            text-transform: uppercase;
-        }
-
-        button:hover {
-            background: #00cc33;
-        }
-
-        .status {
-            color: #888;
-            font-size: 0.8rem;
-            margin-bottom: 5px;
-        }
+        button:hover { background: #00cc33; box-shadow: 0 0 10px #00ff41; }
+        .blink { animation: blinker 1s linear infinite; }
+        @keyframes blinker { 50% { opacity: 0; } }
     </style>
 </head>
 <body>
 
-    <div class="terminal-container">
-        <div class="status">SYSTEM READY... STANDBY FOR DATA</div>
-        <div id="output-window">/root/user/data_fetcher >_ </div>
-        
-        <div class="controls">
-            <button onclick="fetchFromSupabase()">Execute Fetch</button>
-            <button onclick="clearTerminal()">Clear</button>
-        </div>
+    <div id="terminal">--- SYSTEM INITIALIZED ---
+/root/data_retriever > <span class="blink">_</span></div>
+
+    <div class="btn-group">
+        <button onclick="runSecureFetch()">EXECUTE FETCH</button>
+        <button onclick="clearDisplay()">CLEAR</button>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-<script>
-    // 1. Setup Supabase Client
-    // Renamed 'supabase' to 'supabaseClient' to avoid naming conflicts
-    const MASTER = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZqYmxkdGlwcHdyZHh5bmZ3aWR4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIwNTMyMzIsImV4cCI6MjA4NzYyOTIzMn0.7EQHHbYGSPH1mI6kh-XuyMVWxaPrQ4qw7PIBcy-j8I0";
-    const _supabaseUrl = 'https://fjbldtippwrdxynfwidx.supabase.co';
-    const _supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZqYmxkdGlwcHdyZHh5bmZ3aWR4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIwNTMyMzIsImV4cCI6MjA4NzYyOTIzMn0.7EQHHbYGSPH1mI6kh-XuyMVWxaPrQ4qw7PIBcy-j8I0';
-    
-    // Check if the library is loaded and create the client
-    const supabaseClient = supabase.createClient(_supabaseUrl, _supabaseKey);
-    const output = document.getElementById('output-window');
+    <script>
+        // 1. CONFIG - Replace with your actual credentials
+        const MASTER_PASS = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZqYmxkdGlwcHdyZHh5bmZ3aWR4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIwNTMyMzIsImV4cCI6MjA4NzYyOTIzMn0.7EQHHbYGSPH1mI6kh-XuyMVWxaPrQ4qw7PIBcy-j8I0";
+        const SB_URL = 'YOUR_SUPABASE_URL';
+        const SB_KEY = 'YOUR_SUPABASE_ANON_KEY';
 
-function decryptValue(cipherText) {
-    if (!cipherText) return "[No Data]";
-    try {
-        // We explicitly tell CryptoJS to decrypt using our MASTER string
-        const bytes = CryptoJS.AES.decrypt(cipherText, MASTER);
-        
-        // Convert to UTF8 string manually to avoid CSP 'eval' issues
-        const originalText = bytes.toString(CryptoJS.enc.Utf8);
-        
-        // If it's empty, the key or the cipherText is wrong
-        if (!originalText || originalText.length === 0) {
-            return "[Key Mismatch]";
+        // Use 'sbInstance' to avoid conflict with the library's 'supabase' name
+        const sbInstance = supabase.createClient(SB_URL, SB_KEY);
+        const terminalOutput = document.getElementById('terminal');
+
+        // 2. LOGGING HELPER
+        function printToScreen(text) {
+            terminalOutput.innerText += "\n" + text;
+            terminalOutput.scrollTop = terminalOutput.scrollHeight;
         }
-        
-        return originalText;
-    } catch (e) {
-        console.error("Decryption error:", e);
-        return "[Decryption Error]";
-    }
-}
-async function fetchFromSupabase() {
 
-            const decryptedData = data.map(row => {
-    // TEMPORARY: Log the raw data to the console to see what it looks like
-    console.log("Raw row from DB:", row.password); 
-    
-    return {
-        username: row.username,
-        password: decryptValue(row.password), 
-        created_at: row.created_at
-    };
-        });
+        // 3. DECRYPTION ENGINE
+        function tryDecrypt(cipherText) {
+            if (!cipherText) return "---";
+            try {
+                // Decrypting using the MASTER_PASS string
+                const decryptedBytes = CryptoJS.AES.decrypt(cipherText, MASTER_PASS);
+                const result = decryptedBytes.toString(CryptoJS.enc.Utf8);
+                
+                // If result is empty, the MASTER_PASS was likely wrong
+                return result.length > 0 ? result : "[DECODE_FAILED_KEY_ERROR]";
+            } catch (err) {
+                return "[ENCRYPTION_FORMAT_ERROR]";
+            }
+        }
 
-        logToTerminal("------------------------------------------");
-        logToTerminal(JSON.stringify(decryptedData, null, 2));
-        logToTerminal("------------------------------------------");
-        logToTerminal(">_ SESSION COMPLETE.");
-        
-    } catch (err) {
-        logToTerminal("!! SYSTEM ERROR: " + err.message);
-    }
-}
+        // 4. MAIN ACTION
+        async function runSecureFetch() {
+            printToScreen("> ACCESSING ENCRYPTED DATABASE...");
+            
+            try {
+                // CHANGE 'your_table_name' TO YOUR ACTUAL TABLE NAME
+                const { data, error } = await sbInstance
+                    .from('your_table_name')
+                    .select('*');
 
-    function logToTerminal(message) {
-        output.innerText += "\n" + message;
-        output.scrollTop = output.scrollHeight;
-    }
+                if (error) throw error;
 
-    function clearTerminal() {
-        output.innerText = "/root/user/password_retriever >_";
-    }
-</script>
+                printToScreen("> DATA PACKETS RECEIVED. DECRYPTING STREAMS...");
+                printToScreen("--------------------------------------------");
+
+                data.forEach(item => {
+                    // Decrypting the 'password' column found in your screenshot
+                    const decryptedPass = tryDecrypt(item.password);
+                    
+                    printToScreen(`USER: ${item.username}`);
+                    printToScreen(`PASS: ${decryptedPass}`);
+                    printToScreen(`TIME: ${item.created_at}`);
+                    printToScreen("--------------------------------------------");
+                });
+
+                printToScreen("> TASK COMPLETE.");
+
+            } catch (fail) {
+                printToScreen("!! CRITICAL ERROR: " + fail.message);
+                console.error(fail);
+            }
+        }
+
+        function clearDisplay() {
+            terminalOutput.innerText = "/root/data_retriever > _";
+        }
+    </script>
 </body>
 </html>
