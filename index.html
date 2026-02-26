@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta http-equiv="Content-Security-Policy" 
+          content="default-src 'self'; script-src 'self' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline';">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Secure Data Terminal</title>
@@ -36,7 +38,6 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <script>
-        unsafe-eval
         // 1. CONFIG - Replace with your actual credentials
         const MASTER_PASS = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZqYmxkdGlwcHdyZHh5bmZ3aWR4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIwNTMyMzIsImV4cCI6MjA4NzYyOTIzMn0.7EQHHbYGSPH1mI6kh-XuyMVWxaPrQ4qw7PIBcy-j8I0";
         const SB_URL = 'https://fjbldtippwrdxynfwidx.supabase.co';
