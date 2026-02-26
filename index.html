@@ -75,41 +75,45 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-    <script>
-        // 1. Setup Supabase Client
-        const _supabaseUrl = 'https://fjbldtippwrdxynfwidx.supabase.co';
-        const _supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZqYmxkdGlwcHdyZHh5bmZ3aWR4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIwNTMyMzIsImV4cCI6MjA4NzYyOTIzMn0.7EQHHbYGSPH1mI6kh-XuyMVWxaPrQ4qw7PIBcy-j8I0';
-        const supabase = supabase.createClient(_supabaseUrl, _supabaseKey);
+<script>
+    // 1. Setup Supabase Client
+    // Renamed 'supabase' to 'supabaseClient' to avoid naming conflicts
+    const _supabaseUrl = 'https://fjbldtippwrdxynfwidx.supabase.co';
+    const _supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZqYmxkdGlwcHdyZHh5bmZ3aWR4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIwNTMyMzIsImV4cCI6MjA4NzYyOTIzMn0.7EQHHbYGSPH1mI6kh-XuyMVWxaPrQ4qw7PIBcy-j8I0';
+    
+    // Check if the library is loaded and create the client
+    const supabaseClient = supabase.createClient(_supabaseUrl, _supabaseKey);
 
-        const output = document.getElementById('output-window');
+    const output = document.getElementById('output-window');
 
-        async function fetchFromSupabase() {
-            logToTerminal("\nInitializing request to Supabase...");
+    async function fetchFromSupabase() {
+        logToTerminal("\nInitializing request to Supabase...");
 
-            try {
-                // Change 'your_table_name' to your actual table
-                let { data, error } = await supabase
-                    .from('your_table_name')
-                    .select('*');
+        try {
+            // Use the new variable name here
+            let { data, error } = await supabaseClient
+                .from('passwords')
+                .select('*');
 
-                if (error) throw error;
+            if (error) throw error;
 
-                logToTerminal("Success. Data retrieved:");
-                logToTerminal(JSON.stringify(data, null, 2)); // Pretty print JSON
-            } catch (err) {
-                logToTerminal("!! ERROR: " + err.message);
-            }
+            logToTerminal("Success. Data retrieved:");
+            logToTerminal(JSON.stringify(data, null, 2)); 
+        } catch (err) {
+            logToTerminal("!! ERROR: " + err.message);
+            console.error(err);
         }
+    }
 
-        function logToTerminal(message) {
-            output.innerText += "\n" + message;
-            // Auto-scroll to bottom
-            output.scrollTop = output.scrollHeight;
-        }
+    function logToTerminal(message) {
+        if (!output) return;
+        output.innerText += "\n" + message;
+        output.scrollTop = output.scrollHeight;
+    }
 
-        function clearTerminal() {
-            output.innerText = "/root/user/data_fetcher >_";
-        }
-    </script>
+    function clearTerminal() {
+        output.innerText = "/root/user/password_retriever >_";
+    }
+</script>
 </body>
 </html>
